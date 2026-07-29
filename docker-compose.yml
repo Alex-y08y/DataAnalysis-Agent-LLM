@@ -1,0 +1,46 @@
+﻿version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: data-analysis-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: 
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: data-analysis-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_db_data:/app/chroma_db
+      - upload_files_data:/app/upload_files
+      - report_output_data:/app/report_output
+      - logs_data:/app/logs
+
+volumes:
+  mysql_data:
+  chroma_db_data:
+  upload_files_data:
+  report_output_data:
+  logs_data:
