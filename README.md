@@ -1,106 +1,97 @@
-﻿# DataAnalysis-Agent-LLM 智能数据分析 AI 智能体
+# DataAnalysis-Agent-LLM
 
-> **个人独立开发开源作品集项目** — 面向数据分析师、AI 应用开发岗位求职展示
->
-> 基于阿里云通义千问 LLM + LangGraph + **本地免费 Sentence-Transformers Embedding** + **ChromaDB 离线 RAG**
+> 基于阿里云通义千问 LLM + LangGraph + 本地免费 Embedding + ChromaDB 离线 RAG 的企业级智能数据分析 Agent
 
-## 项目简介
+---
 
-**DataAnalysis-Agent-LLM** 是一个基于阿里云通义千问（DashScope）大语言模型 + **完全本地免费 Sentence-Transformers Embedding** + **ChromaDB 离线 RAG 向量存储** 构建的**企业级自然语言数据分析智能 Agent**。
+## 简介
 
-### 解决的企业数据分析痛点
-
-| 痛点 | 方案 |
-|------|------|
-| 业务人员取数门槛高 | 自然语言对话直接取数分析，零 SQL 基础可用 |
-| 指标口径混乱 | RAG 知识库自动检索企业指标规范，杜绝编造 |
-| 报表产出周期长 | 异步定时任务自动生成日报/周报/月报 |
-| 多维分析重复劳动 | 分析模板一键复用，批量数据分析 |
-| **向量额度限制/付费API依赖** | **100% 本地离线 Embedding，零 API 调用，永久免费** |
-
-### 核心特性
-
-- ✅ **全免费架构**：仅消耗通义千问对话免费额度
-- ✅ **本地离线 RAG**：sentence-transformers + ChromaDB
-- ✅ **多数据源支持**：MySQL、Hive、CSV/Excel、HTTP API
-- ✅ **智能对话分析**：多轮上下文记忆，自动识别分析意图
-- ✅ **全链路可视化**：知识库检索→SQL→清洗→绘图→结论
-- ✅ **企业级安全**：RBAC权限、SQL防注入、数据脱敏、审计日志
-
-## 系统架构
-
-`
-┌──────────────────────────────────────────────────┐
-│              前端交互层 (Vue3 + Element Plus)       │
-└──────────────────────┬───────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────┐
-│            AI Agent 核心层 (LangGraph)             │
-│  LLM封装 │ RAG离线检索 │ Agent调度引擎 │ 记忆管理 │
-└──────────────────────┬───────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────┐
-│           可插拔工具能力层                         │
-│  SQL │ 清洗 │ 统计 │ 异常检测 │ 预测 │ 可视化     │
-└──────────────────────┬───────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────┐
-│        底层存储底座 (MySQL + ChromaDB + 文件)      │
-└──────────────────────────────────────────────────┘
-`
+自然语言对话完成数据分析：取数、清洗、统计、异常诊断、预测、可视化、报告生成。**向量模块 100% 本地离线运行，零云端 API 调用，无 Embedding 额度限制。**
 
 ## 技术栈
 
-**后端**: Python, FastAPI, LangChain, LangGraph, DashScope, Sentence-Transformers, ChromaDB, Pandas, Statsmodels, SQLAlchemy
+| 层 | 技术 |
+|------|------|
+| 后端框架 | Python · FastAPI · Uvicorn |
+| AI 引擎 | LangChain · LangGraph |
+| 大语言模型 | 阿里云通义千问 DashScope (qwen-turbo/plus/max) |
+| 本地 Embedding | Sentence-Transformers / all-MiniLM-L6-v2 |
+| 向量存储 | ChromaDB (本地离线) |
+| 数据处理 | Pandas · NumPy · Statsmodels |
+| 数据库 | MySQL · SQLAlchemy |
+| 安全 | JWT · RBAC · 数据脱敏 |
+| 前端 | Vue3 · Vite · Element Plus · ECharts |
+| 部署 | Docker · Docker Compose |
 
-**前端**: Vue3, Vite, Element Plus, ECharts, Pinia, Axios
+## 架构
 
-**存储**: MySQL 8.0+, ChromaDB (本地), Docker
+`
+┌────────────────────────────────────────┐
+│  前端交互 (Vue3 + Element Plus)         │
+├────────────────────────────────────────┤
+│  AI Agent 核心层                       │
+│  LLM → RAG检索 → Agent调度 → 报告生成  │
+├────────────────────────────────────────┤
+│  可插拔工具层                          │
+│  SQL查询 · 数据清洗 · 统计 · 异常检测   │
+│  时序预测 · 可视化 · 脱敏 · 文档解析    │
+├────────────────────────────────────────┤
+│  存储底座 (MySQL + ChromaDB + 文件)     │
+└────────────────────────────────────────┘
+`
 
-## 本地快速部署
+## 快速开始
 
 `ash
-# 1. 克隆仓库
-git clone https://github.com/your-username/DataAnalysis-Agent-LLM.git
+# 1. 克隆
+git clone https://github.com/Alex-y08y/DataAnalysis-Agent-LLM.git
 cd DataAnalysis-Agent-LLM
 
-# 2. 配置 API Key
+# 2. 配置
 cp .env.example .env
-# 编辑 .env，填写 DASHSCOPE_API_KEY
+# 编辑 .env 填写 DASHSCOPE_API_KEY 和 MySQL 密码
 
-# 3. 启动后端
+# 3. 后端
 cd backend
 pip install -r requirements.txt
 python scripts/init_db.py
 python run.py
 
-# 4. 启动前端
+# 4. 前端
 cd frontend
 npm install
 npm run dev
-
-# 访问 http://localhost:5173
-# 默认管理员: admin / admin123
 `
 
-## 项目目录
+访问 http://localhost:5173，默认管理员 admin / admin123。
+
+## 目录结构
 
 `
 DataAnalysis-Agent-LLM/
-├── backend/              # Python 后端
-│   ├── core/llm/        # 通义千问 LLM 封装
-│   ├── core/rag/        # 本地 RAG 知识库
-│   ├── core/agent/      # LangGraph Agent 引擎
-│   ├── tools/           # 9 大可插拔工具
-│   ├── api/             # FastAPI 路由
-│   ├── models/          # ORM 模型
-│   └── services/        # 业务服务
-├── frontend/             # Vue3 前端
-│   └── src/views/       # 9 个功能页面
-├── docs/                 # 项目文档
-└── resume_intro.md       # 简历介绍文案
+├── backend/           # Python 后端
+│   ├── core/llm/     # 通义千问 LLM 封装
+│   ├── core/rag/     # 本地离线 RAG 知识库
+│   ├── core/agent/   # LangGraph Agent 引擎
+│   ├── tools/        # 9 个分析工具
+│   ├── api/          # FastAPI 路由
+│   ├── models/       # ORM 模型
+│   └── services/     # 业务服务
+├── frontend/          # Vue3 前端
+│   └── src/views/    # 9 个功能页面
+├── docs/              # 项目文档
+└── resume_intro.md    # 简历介绍
 `
 
-## 开源
+## 核心特性
 
-本项目基于 MIT 协议开源，自由使用、修改、分发。
+- 自然语言对话取数分析，无需 SQL 基础
+- 知识库 RAG 检索业务指标定义，杜绝编造
+- 多数据源：MySQL / Hive / CSV / API
+- 全链路可视化：检索→SQL→清洗→统计→绘图→结论
+- RBAC 权限 + 数据脱敏 + 审计日志
+- Docker 容器化部署
+
+## 协议
+
+MIT License
